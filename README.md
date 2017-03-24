@@ -30,6 +30,6 @@ You should have access to an OpenShift cluster and be logged in with the
 
 1. Visit the exposed URL with your browser or other HTTP tool, for example:
    ```bash
-   $ curl http://`oc get routes | grep spring-sparkpi | awk '{ print $2 }'`
+   $ curl http://`oc get routes/spring-sparkpi --template='{{.spec.host}}'`
    Pi is rouuuughly 3.1335
    ```
