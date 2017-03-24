@@ -29,8 +29,6 @@ public class SparkPiProducer implements Serializable {
 
         String ret = "Pi is rouuuughly " + 4.0 * count / n;
 
-        jsc.stop();
-
         return ret;
     }
 }
