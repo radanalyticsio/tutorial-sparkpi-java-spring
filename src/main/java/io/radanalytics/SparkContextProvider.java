@@ -5,7 +5,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 
 public class SparkContextProvider {
    private static final SparkContextProvider instance = new SparkContextProvider();
-   
+
    private SparkConf sparkConf;
    private JavaSparkContext sparkContext;
 
