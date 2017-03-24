@@ -19,7 +19,7 @@ You should have access to an OpenShift cluster and be logged in with the
    ```bash
    oc new-app --template oshinko-java-spark-build-dc \
        -p APPLICATION_NAME=spring-sparkpi \
-       -p GIT_URI=https://github.com/radanalyticsio/spark-springpi \
+       -p GIT_URI=https://github.com/radanalyticsio/spring-sparkpi \
        -p APP_FILE=SparkPiBoot-0.0.1-SNAPSHOT.jar
    ```
 
