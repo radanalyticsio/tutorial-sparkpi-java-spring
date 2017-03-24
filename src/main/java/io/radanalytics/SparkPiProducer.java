@@ -3,7 +3,6 @@ package io.radanalytics;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.JavaRDD;
@@ -11,9 +10,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 
 public class SparkPiProducer implements Serializable {
     public String GetPi() {
-        SparkConf sparkConf = new SparkConf().setAppName("JavaSparkPi");
-        sparkConf.setJars(new String[]{"/tmp/src/target/SparkPiBoot-0.0.1-SNAPSHOT.jar.original"});
-        JavaSparkContext jsc = new JavaSparkContext(sparkConf);
+        JavaSparkContext jsc = SparkContextProvider.getContext();
 
         int slices = 2;
         int n = 100000 * slices;
