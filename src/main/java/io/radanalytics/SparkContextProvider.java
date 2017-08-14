@@ -1,21 +1,41 @@
 package io.radanalytics;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.SparkException;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.stereotype.*;
 
 public class SparkContextProvider {
-   private static final SparkContextProvider instance = new SparkContextProvider();
 
-   private SparkConf sparkConf;
-   private JavaSparkContext sparkContext;
+    private static SparkContextProvider INSTANCE = null;
 
-   private SparkContextProvider() {
-       this.sparkConf = new SparkConf().setAppName("JavaSparkPi");
-       this.sparkConf.setJars(new String[]{"/tmp/src/target/SparkPiBoot-0.0.1-SNAPSHOT.jar.original"});
-       this.sparkContext = new JavaSparkContext(sparkConf);
-   }
+    private SparkConf sparkConf;
+    private JavaSparkContext sparkContext;
 
-   public static JavaSparkContext getContext() {
-       return instance.sparkContext;
-   }
+    private SparkContextProvider() {
+    }
+
+    private SparkContextProvider(SparkPiProperties props) {
+        this.sparkConf = new SparkConf().setAppName("JavaSparkPi");
+        this.sparkConf.setJars(new String[]{props.getJarFile()});
+        this.sparkContext = new JavaSparkContext(sparkConf);
+    }
+
+    public static boolean init(SparkPiProperties props) {
+        try {
+            if (INSTANCE == null) {
+                INSTANCE = new SparkContextProvider(props);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    public static JavaSparkContext getContext() {
+        return INSTANCE.sparkContext;
+    }
+
 }
