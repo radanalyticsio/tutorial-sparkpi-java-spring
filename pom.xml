@@ -18,6 +18,7 @@
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
       <java.version>1.8</java.version>
+      <spark.version>2.3.0</spark.version>
    </properties>
    <dependencies>
       <dependency>
@@ -43,7 +44,7 @@
       <dependency>
          <groupId>org.apache.spark</groupId>
          <artifactId>spark-core_2.11</artifactId>
-         <version>2.2.0</version>
+         <version>${spark.version}</version>
          <type>jar</type>
       </dependency>
    </dependencies>
