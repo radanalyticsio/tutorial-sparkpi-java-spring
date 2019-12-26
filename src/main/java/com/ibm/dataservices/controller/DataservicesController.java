@@ -17,7 +17,9 @@ public class DataservicesController {
     @GetMapping("/getFeatures")
     public String prepareData(@RequestParam("inputJson") String input) {
 
-        SparkSession spark = SparkSession.builder().getOrCreate();
+        SparkConf sparkConf = new SparkConf().setAppName("MihuDataserviceAPI");
+        sparkConf.setJars(new String[]{"/opt/app-root/src/@project.name@-@project.version@-original.jar"});
+        SparkSession spark = SparkSession.builder().config(sparkConf).getOrCreate();
         //LOGGER.info("Input Parameters : ", input);
         ProcessingFunctions featureProcessing = new ProcessingFunctions();
         return "input " + featureProcessing.prepareAttrs(spark,input);
