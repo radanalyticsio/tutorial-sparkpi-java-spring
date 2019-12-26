@@ -20,9 +20,9 @@ public class DataservicesController {
 
         SparkSession spark = SparkSession.builder().getOrCreate();
 
-        LOGGER.info("Input Parameters : ", input);
+        //LOGGER.info("Input Parameters : ", input);
         ProcessingFunctions featureProcessing = new ProcessingFunctions();
-        //System.out.println("Input Parameters : " + input);
+        System.out.println("Input Parameters : " + input);
         return "input " + featureProcessing.prepareAttrs(spark,input);
     }
 
