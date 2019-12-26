@@ -1,6 +1,5 @@
 package com.ibm.dataservices.controller;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
 import org.apache.spark.sql.SparkSession;
 import org.apache.log4j.*;
 //import org.slf4j.Logger;
@@ -19,10 +18,8 @@ public class DataservicesController {
     public String prepareData(@RequestParam("inputJson") String input) {
 
         SparkSession spark = SparkSession.builder().getOrCreate();
-
         //LOGGER.info("Input Parameters : ", input);
         ProcessingFunctions featureProcessing = new ProcessingFunctions();
-        System.out.println("Input Parameters : " + input);
         return "input " + featureProcessing.prepareAttrs(spark,input);
     }
 
