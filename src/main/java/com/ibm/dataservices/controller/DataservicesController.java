@@ -22,9 +22,9 @@ public class DataservicesController {
     }
 
     @RequestMapping("/getFeatures")
-    public Map<String,String> prepareData(@RequestParam(value="inputJson", defaultValue="{'attributes':[{'desc':'CustomerIdentifier','dbtype':'mongodb','table':'cards','column':'Customer_ID','colT4mtn':'NA'}]}") String input) {
+    public Map<String,String> prepareData(@RequestParam(value="inputJson", defaultValue=""{'attributes':[{'desc':'CustomerIdentifier','dbtype':'mongodb','table':'cards','column':'Customer_ID','colT4mtn':'NA'},{'desc':'CustomerIdentifier','dbtype':'mariadb','table':'demographics','column':'Customer_ID','colT4mtn':'NA'},{'desc':'BusinessDate','dbtype':'mongodb','table':'cards','column':'Business_Date','colT4mtn':'NA'},{'desc':'CardType','dbtype':'mongodb','table':'cards','column':'Card_Type','colT4mtn':'NA'},{'desc':'PaidAmount','dbtype':'mongodb','table':'cards','column':'Paid_Amount','colT4mtn':'NA'},{'desc':'DateofBirth','dbtype':'mariadb','table':'demographics','column':'DOB','colT4mtn':'NA'},{'desc':'MaritalStatus','dbtype':'mariadb','table':'demographics','column':'Marital_Status','colT4mtn':'NA'},{'desc':'PostalCode','dbtype':'mariadb','table':'demographics','column':'Postal_Code','colT4mtn':'NA'},{'desc':'SelfEmployedorNot','dbtype':'mariadb','table':'demographics','column':'Self_Employed','colT4mtn':'NA'}],'transformations':[{'DST4mtn':'RollingWindow','params':'(Spend_AMT,10,CustomerIdentifier,BusinessDate)','colName':'Calculated_Carry_Over_Amt)'}],'datasetname':'sample'}"") String input) {
         SparkConf sparkConf = new SparkConf().setAppName("MihuDataserviceAPI");
-        sparkConf.setJars(new String[]{"/opt/app-root/src/@project.name@-@project.version@-original.jar"});
+        sparkConf.setJars(new String[]{"/opt/app-root/src/dataserviceapi-0.0.1-SNAPSHOT-original.jar"});
         SparkSession spark = SparkSession.builder().config(sparkConf).getOrCreate();
         //LOGGER.info("Input Parameters : ", input);
         ProcessingFunctions featureProcessing = new ProcessingFunctions();

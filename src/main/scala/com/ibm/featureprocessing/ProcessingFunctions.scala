@@ -34,8 +34,8 @@ class ProcessingFunctions {
   }
 
   def getMariaData(spark: SparkSession,database:String,tableName:String,columns:Array[String]): DataFrame ={
-    val jdbcHostname = "127.0.0.1"
-    val jdbcPort = 34006
+    val jdbcHostname = "mariadb"
+    val jdbcPort = 3306
     val jdbcDatabase = database
     val jdbcUsername = "mariadbuser"
     val jdbcPassword = "mariadbuser"
@@ -74,7 +74,7 @@ class ProcessingFunctions {
     //val jdbcHostname = "127.0.0.1"
     //val jdbcPort = 34006
 
-    val jdbcHostname = "mariadb:"
+    val jdbcHostname = "mariadb"
     val jdbcPort = 3306
 
     val jdbcDatabase = database
