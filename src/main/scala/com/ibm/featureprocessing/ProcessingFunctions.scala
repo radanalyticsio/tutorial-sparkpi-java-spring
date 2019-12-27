@@ -42,7 +42,7 @@ class ProcessingFunctions {
 
     Class.forName("org.mariadb.jdbc.Driver")
     // Create the JDBC URL without passing in the user and password parameters.
-    val jdbcUrl = s"jdbc:mysql://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}"
+    val jdbcUrl = s"jdbc:mariadb://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}"
 
     // Create a Properties() object to hold the parameters.
     import java.util.Properties
@@ -83,7 +83,7 @@ class ProcessingFunctions {
 
     Class.forName("org.mariadb.jdbc.Driver")
     // Create the JDBC URL without passing in the user and password parameters.
-    val jdbcUrl = s"jdbc:mysql://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}"
+    val jdbcUrl = s"jdbc:mariadb://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}"
 
     // Create a Properties() object to hold the parameters.
     import java.util.Properties
