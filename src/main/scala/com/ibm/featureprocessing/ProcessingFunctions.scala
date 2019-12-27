@@ -26,8 +26,8 @@ class ProcessingFunctions {
   }
 
   def getMongoData(spark: SparkSession,database:String,collection:String,columns:Array[String]): DataFrame ={
-    // val uri: String = s"mongodb://mongouser:mongouser@mongodb/${database}.${collection}"
-    val uri: String = s"mongodb://mongouser:mongouser@127.0.0.1:34000/${database}.${collection}"
+     val uri: String = s"mongodb://mongouser:mongouser@mongodb/${database}.${collection}"
+    //val uri: String = s"mongodb://mongouser:mongouser@127.0.0.1:34000/${database}.${collection}"
     val dfRead = spark.read.format("mongo").option("uri", uri).load()
     val result = dfRead.select(columns.head, columns.tail: _*)
     result
@@ -61,8 +61,8 @@ class ProcessingFunctions {
 
 
   def getMongoDataFromSQL(spark: SparkSession,database:String,collection:String,sql:String): DataFrame ={
-    // val uri: String = s"mongodb://mongouser:mongouser@mongodb/${database}.${collection}"
-    val uri: String = s"mongodb://mongouser:mongouser@127.0.0.1:34000/${database}.${collection}"
+    val uri: String = s"mongodb://mongouser:mongouser@mongodb/${database}.${collection}"
+    //val uri: String = s"mongodb://mongouser:mongouser@127.0.0.1:34000/${database}.${collection}"
     val dfRead = spark.read.format("mongo").option("uri", uri).load()
     dfRead.createOrReplaceTempView(collection)
     val result = spark.sql(sql)
@@ -219,7 +219,7 @@ class ProcessingFunctions {
       resulSet = dfMongo.join(dfMaria,"Customer_ID")
     }
 
-    MongoSpark.save(resulSet.write.option("uri", "mongodb://mongouser:mongouser@mongodb/sampledb.churn_data").option("collection", "mihika"))
+    MongoSpark.save(resulSet.write.option("uri", "mongodb://mongouser:mongouser@mongodb/sampledb").option("collection", "mihika"))
 
     val transformationArray = jsonObject.getJSONArray("transformations")
     //println(mariaTables)
