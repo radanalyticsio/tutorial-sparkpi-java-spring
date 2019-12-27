@@ -81,8 +81,6 @@ class ProcessingFunctions {
     val jdbcUsername = "mariadbuser"
     val jdbcPassword = "mariadbuser"
 
-    Class.forName("org.mariadb.jdbc.Driver")
-    // Create the JDBC URL without passing in the user and password parameters.
     val jdbcUrl = s"jdbc:mariadb://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}"
 
     // Create a Properties() object to hold the parameters.
@@ -91,9 +89,6 @@ class ProcessingFunctions {
 
     connectionProperties.put("user", s"${jdbcUsername}")
     connectionProperties.put("password", s"${jdbcPassword}")
-
-    import java.sql.DriverManager
-    val connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword)
 
     val dfRead = spark.read.jdbc(jdbcUrl, tableName, connectionProperties)
     dfRead.createOrReplaceTempView(tableName)
@@ -185,10 +180,9 @@ class ProcessingFunctions {
       mariaQueries(tableName) = "select " + selectColumns + " from " + tableName
       println(mariaQueries)
     }
-    /*for( (tableName,sql) <- mongoQueries){
+    for( (tableName,sql) <- mongoQueries){
       mongoDatasets += processingFunctions.getMongoDataFromSQL(spark,"sampledb",tableName,sql)
     }
-     */
     for( (tableName,sql) <- mariaQueries){
       mariaDatasets += processingFunctions.getMariaDataFromSQL(spark,"sampledb",tableName,sql)
     }
