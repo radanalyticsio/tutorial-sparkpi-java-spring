@@ -6,6 +6,8 @@ import org.json.{JSONArray, JSONObject}
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 import com.mongodb.spark._
+import com.mongodb.spark.config._
+
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions.{current_timestamp, sum}
 
