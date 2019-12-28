@@ -50,7 +50,7 @@ class ProcessingFunctions {
 
     connectionProperties.put("user", s"${jdbcUsername}")
     connectionProperties.put("password", s"${jdbcPassword}")
-	connectionProperties.put("driver", "com.mysql.jdbc.Driver")
+	connectionProperties.put("driver", "com.mysql.cj.jdbc.Driver")
     val dfRead = spark.read.jdbc(jdbcUrl, tableName, connectionProperties)
     val result = dfRead.select(columns.head, columns.tail: _*)
     result
@@ -92,7 +92,7 @@ class ProcessingFunctions {
 
     connectionProperties.put("user", s"${jdbcUsername}")
     connectionProperties.put("password", s"${jdbcPassword}")
-	connectionProperties.put("driver", "com.mysql.jdbc.Driver")
+	connectionProperties.put("driver", "com.mysql.cj.jdbc.Driver")
 	
     val dfRead = spark.read.jdbc(jdbcUrl, tableName, connectionProperties)
     dfRead.createOrReplaceTempView(tableName)
