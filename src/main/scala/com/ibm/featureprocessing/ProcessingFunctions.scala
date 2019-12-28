@@ -248,7 +248,7 @@ class ProcessingFunctions {
 	
 	//change for local
     //resulSetFinal.write.option("uri", "mongodb://mongouser:mongouser@127.0.0.1:34000/sampledb").option("collection", "output_coll").format("mongo").mode(SaveMode.Append).save()
-	resulSetFinal.write.option("uri", "mongodb://mongouser:mongouser@@mongodb/sampledb").option("collection", "output_coll").format("mongo").mode(SaveMode.Append).save()
+	resulSetFinal.write.option("uri", "mongodb://mongouser:mongouser@mongodb/sampledb").option("collection", "output_coll").format("mongo").mode(SaveMode.Append).save()
 	
     return s"Resultset is uploaded in collection 'output_coll'"
   }
