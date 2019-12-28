@@ -16,7 +16,13 @@ class ProcessingFunctions {
 	val uri: String = s"mongodb://mongouser:mongouser@mongodb/${database}.${collection}"
     //val uri: String = s"mongodb://mongouser:mongouser@127.0.0.1:34000/${database}.${collection}"
 	
-    val dfRead = spark.read.format("mongo").option("uri", uri).load()
+  val customReadConfig = ReadConfig(
+      Map("uri" -> uri)
+    )
+
+    //val dfRead = spark.read.format("mongo").option("uri", uri).load()
+    val dfRead = spark.read.format("mongo").options(customReadConfig.asOptions).load()
+
     val result = dfRead.select(columns.head, columns.tail: _*)
     result
   }
@@ -42,7 +48,7 @@ class ProcessingFunctions {
 
     connectionProperties.put("user", s"${jdbcUsername}")
     connectionProperties.put("password", s"${jdbcPassword}")
-
+	connectionProperties.put("driver", "com.mysql.jdbc.Driver")
     val dfRead = spark.read.jdbc(jdbcUrl, tableName, connectionProperties)
     val result = dfRead.select(columns.head, columns.tail: _*)
     result
@@ -52,7 +58,13 @@ class ProcessingFunctions {
     //Changes for local setup
     val uri: String = s"mongodb://mongouser:mongouser@mongodb/${database}.${collection}"
     //val uri: String = s"mongodb://mongouser:mongouser@127.0.0.1:34000/${database}.${collection}"
-    val dfRead = spark.read.format("mongo").option("uri", uri).load()
+	val customReadConfig = ReadConfig(
+      Map("uri" -> uri)
+    )
+
+    //val dfRead = spark.read.format("mongo").option("uri", uri).load()
+    val dfRead = spark.read.format("mongo").options(customReadConfig.asOptions).load()
+	
     dfRead.createOrReplaceTempView(collection)
     val result = spark.sql(sql)
     result
@@ -78,7 +90,8 @@ class ProcessingFunctions {
 
     connectionProperties.put("user", s"${jdbcUsername}")
     connectionProperties.put("password", s"${jdbcPassword}")
-
+	connectionProperties.put("driver", "com.mysql.jdbc.Driver")
+	
     val dfRead = spark.read.jdbc(jdbcUrl, tableName, connectionProperties)
     dfRead.createOrReplaceTempView(tableName)
     val result = spark.sql(sql)
@@ -233,7 +246,7 @@ class ProcessingFunctions {
 	
 	//change for local
     //resulSetFinal.write.option("uri", "mongodb://mongouser:mongouser@127.0.0.1:34000/sampledb").option("collection", "output_coll").format("mongo").mode(SaveMode.Append).save()
-	resulSetFinal.write.option("uri", "mongodb://mongouser:mongouser@127.0.0.1:34000/sampledb").option("collection", "output_coll").format("mongo").mode(SaveMode.Append).save()
+	resulSetFinal.write.option("uri", "mongodb://mongouser:mongouser@@mongodb/sampledb").option("collection", "output_coll").format("mongo").mode(SaveMode.Append).save()
 	
     return s"Resultset is uploaded in collection 'output_coll'"
   }
