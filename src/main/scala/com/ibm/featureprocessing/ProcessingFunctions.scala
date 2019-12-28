@@ -1,48 +1,40 @@
 package com.ibm.featureprocessing
 
-import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, Row, SaveMode, SparkSession}
 import org.json.{JSONArray, JSONObject}
 
 import scala.collection.mutable
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
-
 import com.mongodb.spark._
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.functions.{current_timestamp, sum}
 
 class ProcessingFunctions {
 
-  def processFeatures(spark: SparkSession,inputFeatures:String,transformations:String,datasetName:String) : String = {
-
-    val uri: String = s"mongodb://mongouser:mongouser@mongodb/sampledb"
-    // This piece is used for data loading in mongodb
-    // val df = spark.read.format("csv").option("header","true").option("inferSchema","true").load("C:\\data\\apps\\projects\\datamicroservices\\openshift_spark\\src\\main\\resources\\WAFnUseCTelcoCustomerChurn.csv")
-    // MongoSpark.save(df.write.option("collection", "churn_data").mode("overwrite"))
-    //val spark = SparkSession.builder.master("spark://172.18.91.49:7077").config(sc.getConf).getOrCreate()
-    val dfRead = spark.read.format("mongo").option("uri", "mongodb://mongouser:mongouser@mongodb/sampledb.churn_data").load()
-    dfRead.select("customerID","gender")
-    val sampleDf = dfRead.takeAsList(10).toString()
-    //val readConfig = ReadConfig(Map("collection" -> "churn_data", Some(ReadConfig(spark)))
-    //val customRdd = MongoSpark.load(spark readConfig)
-    sampleDf
-  }
-
   def getMongoData(spark: SparkSession,database:String,collection:String,columns:Array[String]): DataFrame ={
-     val uri: String = s"mongodb://mongouser:mongouser@mongodb/${database}.${collection}"
+    //Changes for local setup
+	val uri: String = s"mongodb://mongouser:mongouser@mongodb/${database}.${collection}"
     //val uri: String = s"mongodb://mongouser:mongouser@127.0.0.1:34000/${database}.${collection}"
+	
     val dfRead = spark.read.format("mongo").option("uri", uri).load()
     val result = dfRead.select(columns.head, columns.tail: _*)
     result
   }
 
   def getMariaData(spark: SparkSession,database:String,tableName:String,columns:Array[String]): DataFrame ={
-    val jdbcHostname = "mariadb"
+    //Changes for local setup
+	val jdbcHostname = "mysql"
     val jdbcPort = 3306
-    val jdbcDatabase = database
-    val jdbcUsername = "mariadbuser"
-    val jdbcPassword = "mariadbuser"
+    //val jdbcHostname = "127.0.0.1"
+    //val jdbcPort = 34006
 
-    Class.forName("org.mariadb.jdbc.Driver")
+    val jdbcDatabase = database
+	
+    val jdbcUsername = "mysql"
+    val jdbcPassword = "mysql"
+
     // Create the JDBC URL without passing in the user and password parameters.
-    val jdbcUrl = s"jdbc:mariadb://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}"
+    val jdbcUrl = s"jdbc:mysql://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}"
 
     // Create a Properties() object to hold the parameters.
     import java.util.Properties
@@ -51,16 +43,13 @@ class ProcessingFunctions {
     connectionProperties.put("user", s"${jdbcUsername}")
     connectionProperties.put("password", s"${jdbcPassword}")
 
-    import java.sql.DriverManager
-    val connection = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword)
-
     val dfRead = spark.read.jdbc(jdbcUrl, tableName, connectionProperties)
     val result = dfRead.select(columns.head, columns.tail: _*)
     result
   }
 
-
   def getMongoDataFromSQL(spark: SparkSession,database:String,collection:String,sql:String): DataFrame ={
+    //Changes for local setup
     val uri: String = s"mongodb://mongouser:mongouser@mongodb/${database}.${collection}"
     //val uri: String = s"mongodb://mongouser:mongouser@127.0.0.1:34000/${database}.${collection}"
     val dfRead = spark.read.format("mongo").option("uri", uri).load()
@@ -73,15 +62,15 @@ class ProcessingFunctions {
     //local
     //val jdbcHostname = "127.0.0.1"
     //val jdbcPort = 34006
-
-    val jdbcHostname = "mariadb"
+    val jdbcHostname = "mysql"
     val jdbcPort = 3306
 
     val jdbcDatabase = database
-    val jdbcUsername = "mariadbuser"
-    val jdbcPassword = "mariadbuser"
+    val jdbcUsername = "mysql"
+    val jdbcPassword = "mysql"
 
-    val jdbcUrl = s"jdbc:mariadb://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}"
+    // Create the JDBC URL without passing in the user and password parameters.
+    val jdbcUrl = s"jdbc:mysql://${jdbcHostname}:${jdbcPort}/${jdbcDatabase}"
 
     // Create a Properties() object to hold the parameters.
     import java.util.Properties
@@ -97,11 +86,12 @@ class ProcessingFunctions {
   }
 
   def prepareAttrs(spark:SparkSession,inputJson:String): String ={
+    import spark.implicits._
     var dfMaria= spark.emptyDataFrame
     var dfMongo= spark.emptyDataFrame
 
     val processingFunctions = new ProcessingFunctions()
-    //val inputJson:String = "{ \"attributes\": [ { \"desc\": \"Customer Identifier\", \"dbtype\": \"mongodb\", \"table\": \"cards\", \"column\": \"Customer_ID\", \"colT4mtn\": \"NA\" },{ \"desc\": \"Customer Identifier\", \"dbtype\": \"mariadb\", \"table\": \"demographics\", \"column\": \"Customer_ID\", \"colT4mtn\": \"NA\" }, { \"desc\": \"Business Date\", \"dbtype\": \"mongodb\", \"table\": \"cards\", \"column\": \"Business_Date\", \"colT4mtn\": \"NA\" }, { \"desc\": \"Card Type\", \"dbtype\": \"mongodb\", \"table\": \"cards\", \"column\": \"Card_Type\", \"colT4mtn\": \"NA\" }, { \"desc\": \"Paid Amount\", \"dbtype\": \"mongodb\", \"table\": \"cards\", \"column\": \"Paid_Amount\", \"colT4mtn\": \"NA\" }, { \"desc\": \"Date of Birth\", \"dbtype\": \"mariadb\", \"table\": \"demographics\", \"column\": \"DOB\", \"colT4mtn\": \"NA\" }, { \"desc\": \"Marital Status\", \"dbtype\": \"mariadb\", \"table\": \"demographics\", \"column\": \"Marital_Status\", \"colT4mtn\": \"NA\" }, { \"desc\": \"Postal Code\", \"dbtype\": \"mariadb\", \"table\": \"demographics\", \"column\": \"Postal_Code\", \"colT4mtn\": \"NA\" }, { \"desc\": \"Self Employed or Not\", \"dbtype\": \"mariadb\", \"table\": \"demographics\", \"column\": \"Self_Employed\", \"colT4mtn\": \"NA\" } ], \"transformations\": [ { \"DST4mtn\": \"Rolling Window\", \"params\": \"(Spend_AMT,10,Customer Identifier,Business Date)\", \"colName\": \"Carry_Over_Amt)\" } ], \"datasetname\": \"sample\" }"
+    //val inputJson:String = "{'attributes':[{'desc':'Spend Amount','dbtype':'mongodb','table':'cards','column':'Spend_Amount','colT4mtn':'NA'},{'desc':'CustomerIdentifier','dbtype':'mongodb','table':'cards','column':'Customer_ID','colT4mtn':'NA'},{'desc':'CustomerIdentifier','dbtype':'mariadb','table':'demographics','column':'Customer_ID','colT4mtn':'NA'},{'desc':'BusinessDate','dbtype':'mongodb','table':'cards','column':'Business_Date','colT4mtn':'NA'},{'desc':'CardType','dbtype':'mongodb','table':'cards','column':'Card_Type','colT4mtn':'NA'},{'desc':'PaidAmount','dbtype':'mongodb','table':'cards','column':'Paid_Amount','colT4mtn':'NA'},{'desc':'DateofBirth','dbtype':'mariadb','table':'demographics','column':'DOB','colT4mtn':'NA'},{'desc':'MaritalStatus','dbtype':'mariadb','table':'demographics','column':'Marital_Status','colT4mtn':'NA'},{'desc':'PostalCode','dbtype':'mariadb','table':'demographics','column':'Postal_Code','colT4mtn':'NA'},{'desc':'SelfEmployedorNot','dbtype':'mariadb','table':'demographics','column':'Self_Employed','colT4mtn':'NA'}],'transformations':[{'DST4mtn':'RollingWindow','params':'(Spend_Amount,10,Customer_ID,Business_Date)','colName':'Calculated_Carry_Over_Amt'}],'datasetname':'sample'}"
 
     val jsonObject = new JSONObject(inputJson.trim())
     val keys = jsonObject.keys()
@@ -183,6 +173,7 @@ class ProcessingFunctions {
     for( (tableName,sql) <- mongoQueries){
       mongoDatasets += processingFunctions.getMongoDataFromSQL(spark,"sampledb",tableName,sql)
     }
+
     for( (tableName,sql) <- mariaQueries){
       mariaDatasets += processingFunctions.getMariaDataFromSQL(spark,"sampledb",tableName,sql)
     }
@@ -212,13 +203,39 @@ class ProcessingFunctions {
     } else{
       resulSet = dfMongo.join(dfMaria,"Customer_ID")
     }
-
-    MongoSpark.save(resulSet.write.option("uri", "mongodb://mongouser:mongouser@mongodb/sampledb").option("collection", "mihika"))
-
+    resulSet.show()
+    var resulSetTemp = spark.emptyDataFrame
+    import spark.implicits._
     val transformationArray = jsonObject.getJSONArray("transformations")
+    val transLen = transformationArray.length()
+    for (i <- 1 to transLen) {
+      val transformEntry = transformationArray.getJSONObject(i - 1)
+      val transFunc = transformEntry.getString("DST4mtn")
+      val colName = transformEntry.getString("colName")
+      val params = transformEntry.getString("params")
+      println(params)
+      println(transFunc)
+      println(colName)
+      val paramArray = params.replaceAll("[()]","").split(",")
+      println(paramArray)
+      if(transFunc == "RollingWindow"){
+        val windowSpec = Window.partitionBy(paramArray(2)).orderBy(paramArray(3)).rowsBetween((paramArray(1).toInt * -1),0)
+        resulSetTemp = resulSet.withColumn(colName,sum(resulSet(paramArray(0))).over(windowSpec))
+        resulSetTemp.show()
+      }
+    }
+    resulSetTemp.printSchema()
+    val resulSetFinal = resulSetTemp.withColumn("refresh_date",current_timestamp)
+    println("final schema")
+    resulSetFinal.printSchema()
     //println(mariaTables)
     //println(mariaDS)
-    resulSet.take(5).toString()
+	
+	//change for local
+    //resulSetFinal.write.option("uri", "mongodb://mongouser:mongouser@127.0.0.1:34000/sampledb").option("collection", "output_coll").format("mongo").mode(SaveMode.Append).save()
+	resulSetFinal.write.option("uri", "mongodb://mongouser:mongouser@127.0.0.1:34000/sampledb").option("collection", "output_coll").format("mongo").mode(SaveMode.Append).save()
+	
+    return s"Resultset is uploaded in collection 'output_coll'"
   }
 
 }
