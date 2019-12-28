@@ -195,7 +195,7 @@ class ProcessingFunctions {
     if(mongoDatasets.length > 0){
       dfMongo = mongoDatasets(0)
       var i=1
-      while(i < (mongoDatasets.length - 1) ){
+      while(i <= (mongoDatasets.length - 1) ){
         dfMongo = dfMongo.join(mongoDatasets(i),"Customer_ID")
         i+1
       }
@@ -203,7 +203,7 @@ class ProcessingFunctions {
     if(mariaDatasets.length > 0){
       dfMaria = mariaDatasets(0)
       var i=1
-      while(i < (mariaDatasets.length - 1) ){
+      while(i <= (mariaDatasets.length - 1) ){
         dfMaria = dfMaria.join(mariaDatasets(i),"Customer_ID")
         i+1
       }
