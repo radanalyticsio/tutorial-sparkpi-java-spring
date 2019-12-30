@@ -9,6 +9,7 @@ import com.mongodb.spark._
 import com.mongodb.spark.config._
 
 import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.{current_timestamp, sum}
 
 class ProcessingFunctions {
@@ -149,7 +150,7 @@ class ProcessingFunctions {
             firstEle = false
           }
           if(ele.getString("colT4mtn") != "NA") {
-            selectColumns += ele.getString("coolT4mtn") + "(" + ele.getString("column") + ") as " + ele.getString("column")
+            selectColumns += ele.getString("colT4mtn") + "(" + ele.getString("column") + ") as " + ele.getString("column")
           }else
           {
             selectColumns += ele.getString("column")
@@ -174,7 +175,7 @@ class ProcessingFunctions {
             firstEle = false
           }
           if(ele.getString("colT4mtn") != "NA") {
-            selectColumns += ele.getString("coolT4mtn") + "(" + ele.getString("column") + ") as " + ele.getString("column")
+            selectColumns += ele.getString("colT4mtn") + "(" + ele.getString("column") + ") as " + ele.getString("column")
           }else
           {
             selectColumns += ele.getString("column")
